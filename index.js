@@ -37,7 +37,7 @@ async function startServer() {
 				res.send(questions);
 			} catch (err) {
 				console.error(err);
-				res.send("Server error");
+				res.status(500).send("Server error");
 			}
 		});
 
@@ -48,6 +48,47 @@ async function startServer() {
 		console.error(err);
 		process.exit(1);
 	}
+
+	//POST /submit-quiz
+	app.post("/submit-quiz", async (req, res) => {
+		try {
+			const quizDb = client.db("ranking");
+			const rankingCollection = quizDb.collection("leaderboard");
+
+			const { userName, score, timeTaken } = req.body;
+
+			await rankingCollection.insertOne({
+				userName,
+				score,
+				timeTaken,
+			});
+
+			res.send({ message: "Saved" });
+		} catch (err) {
+			console.error(err);
+			res.status(500).send("Server error");
+		}
+	});
+
+	//GET /leaderboard
+	app.get("/leaderboard", async (req, res) => {
+		try {
+			const quizDb = client.db("ranking");
+			const rankingCollection = quizDb.collection("leaderboard");
+
+			const top10 = await rankingCollection
+				.find()
+				//Highest score first, fastest time wins ties
+				.sort({ score: -1, timeTaken: 1 })
+				.limit(10)
+				.toArray();
+
+			res.send(top10);
+		} catch (err) {
+			console.error(err);
+			res.status(500).send("Server error");
+		}
+	});
 }
 
 startServer();
