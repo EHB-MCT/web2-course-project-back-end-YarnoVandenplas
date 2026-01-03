@@ -19,6 +19,8 @@
 	},
 	"homepage": "https://github.com/EHB-MCT/web2-course-project-back-end-YarnoVandenplas#readme",
 	"dependencies": {
-		"express": "^5.2.1"
+		"dotenv": "^17.2.3",
+		"express": "^5.2.1",
+		"mongodb": "^7.0.0"
 	}
 }
